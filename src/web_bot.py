@@ -13,9 +13,10 @@ BOT_INFO = (
     "[GitHub](https://github.com/bradysalz/DCI-Scores-Bot-v2)!" +
     " Please PM me with any additional feedback.* \n\n" + "*Hope you enjoy!*")
 
-ORG_URL = 'http://bridge.competitionsuite.com/api/orgscores/GetCompetitionsByOrganization/jsonp'  # noqa
-COMP_URL = 'http://bridge.competitionsuite.com/api/orgscores/GetCompetition/jsonp'  # noqa
+ORG_URL = "https://api.competitionsuite.com/2018-03/competitions"
+COMP_URL = "https://api.competitionsuite.com/2018-03/performances"
 DCI_API_ID = '96b77ec2-333e-41e9-8d7d-806a8cbe116b'
+YEAR = '2022'
 
 
 class WebBot(object):
@@ -70,13 +71,18 @@ class WebBot(object):
         show_guid: an API GUID that corresponds to a certain show
         returns: a two-item tuple with the formatted title and reddit body
         """
-        api_keys = {'competition': show_guid, 'callback': 'jQuery'}
+        api_keys = {'c': show_guid}
         resp = requests.get(COMP_URL, params=api_keys)
 
         # Strip off jquery tags from the response string
         content = resp.content.decode('utf-8')
-        show = json.loads(content[7:-2])
+        show = json.loads(content)
 
+        # This is where to parse the show details.
+        # show object above is a list
+        # for each object in list, determine if Bluecoats are a competitor
+        # If so, then parse down to the visual subcaptions
+        # This can associate scores by judge
         title_str = '[Score Recap] ' + show['name'] + ' | ' + show['location']
         body = self._parse_show_recap(show['rounds'])
         return (title_str, body)
@@ -93,11 +99,11 @@ class WebBot(object):
 
     def get_show_list(self) -> List[Dict]:
         """Scrapes the DCI.org API site and returns a list of shows"""
-        api_keys = {'organization': DCI_API_ID, 'callback': 'jQuery'}
+        api_keys = {'year': YEAR}
 
         resp = requests.get(ORG_URL, params=api_keys)
+
         content = resp.content.decode('utf-8')
 
         # Strip off jquery tags from the response string
-        json_content = json.loads(content[7:-2])
-        return json_content['competitions']
+        return json.loads(content)

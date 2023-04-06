@@ -20,9 +20,9 @@ class ShowManager(object):
         """Adds a show to the current dataframe."""
         df = pd.DataFrame(
             {
-                'Name': [show_info['name']],
-                'Date': [show_info['competitionDate']],
-                'GUID': [show_info['competitionGuid']],
+                'Name': [show_info['EventName']],
+                'Date': [show_info['Date']],
+                'GUID': [show_info['CompetitionGuid']],
             },
             columns=['Name', 'Date', 'GUID'])
         self.shows = self.shows.append(df)
@@ -47,10 +47,11 @@ class ShowManager(object):
         web_shows = self.bot.get_show_list()
 
         for show in web_shows:
-            if show['competitionGuid'] not in self.shows.GUID.values:
+            if show['CompetitionGuid'] not in self.shows.GUID.values:
                 self._add_show(show)
                 self.shows.to_csv(show_file, index=False, header=False)
-                
+                print(self.bot._parse_show_info(show["CompetitionGuid"]))
+
                 if post:
                     self.bot.post_thread(show)
                     print('Added {}'.format(show['name']))
