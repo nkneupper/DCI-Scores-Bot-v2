@@ -74,7 +74,6 @@ class WebBot(object):
         api_keys = {'c': show_guid}
         resp = requests.get(COMP_URL, params=api_keys)
 
-        # Strip off jquery tags from the response string
         content = resp.content.decode('utf-8')
         show = json.loads(content)
 
@@ -94,7 +93,7 @@ class WebBot(object):
         """
         subr = self.conn.subreddit(self.subreddit)
 
-        title, body = self._parse_show_info(show_info['competitionGuid'])
+        title, body = self._parse_show_info(show_info["CompetitionGuid"])
         subr.submit(title, selftext=body)
 
     def get_show_list(self) -> List[Dict]:

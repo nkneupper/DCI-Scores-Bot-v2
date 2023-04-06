@@ -25,7 +25,7 @@ class ShowManager(object):
                 'GUID': [show_info['CompetitionGuid']],
             },
             columns=['Name', 'Date', 'GUID'])
-        self.shows = self.shows.append(df)
+        self.shows = self.shows._append(df)
 
     def check_if_new_shows(self, post: bool=True):
         """Checks for shows and posts to reddit if selected.
@@ -43,16 +43,15 @@ class ShowManager(object):
                 f.write('Name,Date,GUID\n')
             self.check_if_new_shows()
 
-        self.bot.connect()
         web_shows = self.bot.get_show_list()
 
         for show in web_shows:
             if show['CompetitionGuid'] not in self.shows.GUID.values:
                 self._add_show(show)
                 self.shows.to_csv(show_file, index=False, header=False)
-                print(self.bot._parse_show_info(show["CompetitionGuid"]))
 
                 if post:
+                    self.bot.connect()
                     self.bot.post_thread(show)
                     print('Added {}'.format(show['name']))
                     time.sleep(9 * 60)  # Reddit API timeout
