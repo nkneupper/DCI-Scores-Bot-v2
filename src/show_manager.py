@@ -45,13 +45,12 @@ class ShowManager(object):
 
         web_shows = self.bot.get_show_list()
 
+        if post:
+            self.bot.connect()
+
         for show in web_shows:
             if show['CompetitionGuid'] not in self.shows.GUID.values:
+                if post:
+                    self.bot.post_rows(show)
                 self._add_show(show)
                 self.shows.to_csv(show_file, index=False, header=False)
-
-                if post:
-                    self.bot.connect()
-                    self.bot.post_thread(show)
-                    print('Added {}'.format(show['name']))
-                    time.sleep(9 * 60)  # Reddit API timeout
